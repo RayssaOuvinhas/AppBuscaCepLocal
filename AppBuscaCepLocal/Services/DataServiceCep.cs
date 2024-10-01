@@ -1,4 +1,5 @@
 ﻿using AppBuscaCepLocal.Model;
+using Newtonsoft.Json;
 
 namespace AppBuscaCepLocal.Services
 {
@@ -10,16 +11,20 @@ namespace AppBuscaCepLocal.Services
 
             using (HttpClient client = new HttpClient())
             {
-                HttpRequestMessage response = await client.GetAsync("http://10.0.2.2:8000/endereco/by-cep?cep=" + cep);
+                // 10.0.2.2
+                HttpResponseMessage response = await client.GetAsync("http://10.0.2.2:8000/endereco/by-cep?cep=" + cep);
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     string json = response.Content.ReadAsStringAsync().Result;
-                    end = jsonConvert;
-                }
 
+                    end = JsonConvert.DeserializeObject<Endereco>(json);
+                }
+                else
+                    throw new Exception(response.RequestMessage.Content.ToString());
             }
 
+            return end;
         }
     }
 }
